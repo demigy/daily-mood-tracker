@@ -1,96 +1,70 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Button, StyleSheet, Text, Image } from 'react-native';
-import { Camera } from 'expo-camera';
+import React, { useState, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Button } from 'react-native';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 
 export default function CameraScreen({ navigation }) {
-  const [hasPermission, setHasPermission] = useState(null);
-  const [cameraType, setCameraType] = useState(Camera.Constants.Type.back);
-  const [photo, setPhoto] = useState(null);
+  const [facing, setFacing] = useState('back');
+  const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef(null);
 
-  useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
+  if (!permission) {
+    return <View style={styles.center}><Text>Requesting permissions...</Text></View>;
+  }
+
+  if (!permission.granted) {
+    return (
+      <View style={styles.center}>
+        <Text style={{ textAlign: 'center' }}>We need your permission to show the camera</Text>
+        <Button onPress={requestPermission} title="Grant Permission" />
+      </View>
+    );
+  }
+
+  const toggleCameraFacing = () => {
+    setFacing((current) => (current === 'back' ? 'front' : 'back'));
+  };
 
   const takePicture = async () => {
     if (cameraRef.current) {
-      try {
-        const picture = await cameraRef.current.takePictureAsync();
-        setPhoto(picture.uri);
-        console.log('Photo taken:', picture.uri);
-      } catch (error) {
-        console.log('Error taking picture:', error);
-      }
+      const photo = await cameraRef.current.takePictureAsync();
+      alert('📸 Picture captured!');
+      console.log(photo.uri);
     }
   };
 
-  if (hasPermission === null) {
-    return (
-      <View style={styles.center}>
-        <Text>Requesting camera permission...</Text>
-      </View>
-    );
-  }
-
-  if (hasPermission === false) {
-    return (
-      <View style={styles.center}>
-        <Text>No access to camera</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
-      {!photo ? (
-        <>
-          <Camera
-            style={styles.camera}
-            type={cameraType}
-            ref={cameraRef}
-            ratio="16:9"
-          />
-          <View style={styles.controls}>
-            <Button
-              title="Flip Camera"
-              onPress={() => {
-                setCameraType(
-                  cameraType === Camera.Constants.Type.back
-                    ? Camera.Constants.Type.front
-                    : Camera.Constants.Type.back
-                );
-              }}
-            />
-            <Button title="Take Picture" onPress={takePicture} />
-            <Button title="Go Back" onPress={() => navigation.goBack()} />
-          </View>
-        </>
-      ) : (
-        <>
-          <Image source={{ uri: photo }} style={styles.preview} />
-          <View style={styles.controls}>
-            <Button title="Retake" onPress={() => setPhoto(null)} />
-            <Button title="Go Back" onPress={() => navigation.goBack()} />
-          </View>
-        </>
-      )}
+      <CameraView style={styles.camera} facing={facing} ref={cameraRef}>
+        <View style={styles.controls}>
+          <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
+            <Text style={styles.text}>Flip</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={takePicture}>
+            <Text style={styles.text}>Capture</Text>
+          </TouchableOpacity>
+        </View>
+      </CameraView>
+      <Button title="Go Back" onPress={() => navigation.goBack()} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'black' },
+  container: { flex: 1, backgroundColor: '#000' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   camera: { flex: 1 },
   controls: {
-    position: 'absolute',
-    bottom: 30,
-    alignSelf: 'center',
+    flex: 1,
     flexDirection: 'row',
-    gap: 10,
+    justifyContent: 'space-around',
+    alignItems: 'flex-end',
+    backgroundColor: 'transparent',
+    marginBottom: 40,
   },
-  preview: { flex: 1, resizeMode: 'contain' },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  button: {
+    padding: 15,
+    backgroundColor: '#6200ee',
+    borderRadius: 10,
+  },
+  text: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
 });
