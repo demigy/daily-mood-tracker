@@ -9,6 +9,7 @@ export default function HomeScreen({ navigation }) {
       <Button title="View Details" onPress={() => navigation.navigate('MoodDetails')} />
       <Button title="Open Camera" onPress={() => navigation.navigate('Camera')} />
         <Button title="Open Accelerometer" onPress={() => navigation.navigate('Accelerometer')} />
+            <Button title="Edit Mood" onPress={() => navigation.navigate('EditMood')} />
             <Button title="View Moods (API)" onPress={() => navigation.navigate('MoodList')} />
     </View>
   );

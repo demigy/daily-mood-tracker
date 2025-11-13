@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 
 // Import all screens
+import EditMoodScreen from './screens/EditMoodScreen';
 import MoodListScreen from './screens/MoodListScreen';
 import AccelerometerScreen from './screens/AccelerometerScreen';
 import CameraScreen from './screens/CameraScreen';
@@ -59,6 +60,7 @@ export default function App() {
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen name="EditMood" component={EditMoodScreen} />
         <Stack.Screen
           name="MainTabs"
           component={MainTabs}
