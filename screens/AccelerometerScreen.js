@@ -1,62 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
-import { Accelerometer } from 'expo-sensors';
+// screens/AccelerometerScreen.js
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet } from "react-native";
+import { Card, Title, Paragraph, Button } from "react-native-paper";
+import { Accelerometer } from "expo-sensors";
 
 export default function AccelerometerScreen({ navigation }) {
-  const [data, setData] = useState({ x: 0, y: 0, z: 0 });
-  const [subscription, setSubscription] = useState(null);
-  const [message, setMessage] = useState('');
-
-  const _subscribe = () => {
-    setSubscription(
-      Accelerometer.addListener(accelerometerData => {
-        setData(accelerometerData);
-
-        const { x, y, z } = accelerometerData;
-        const totalForce = Math.sqrt(x * x + y * y + z * z);
-        if (totalForce > 1.8) {
-          setMessage('📱 You shook your phone!');
-        } else {
-          setMessage('');
-        }
-      })
-    );
-    Accelerometer.setUpdateInterval(500); // update every 0.5s
-  };
-
-  const _unsubscribe = () => {
-    subscription && subscription.remove();
-    setSubscription(null);
-  };
+  const [data, setData] = useState({ x:0,y:0,z:0 });
 
   useEffect(() => {
-    _subscribe();
-    return () => _unsubscribe();
+    const sub = Accelerometer.addListener(acc => setData(acc));
+    Accelerometer.setUpdateInterval(300);
+    return () => sub && sub.remove();
   }, []);
-
-  const { x, y, z } = data;
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Accelerometer Data</Text>
-      <Text>X: {x.toFixed(2)}</Text>
-      <Text>Y: {y.toFixed(2)}</Text>
-      <Text>Z: {z.toFixed(2)}</Text>
-
-      {message ? <Text style={styles.message}>{message}</Text> : null}
-
-      <View style={styles.buttons}>
-        <Button title="Stop Sensor" onPress={_unsubscribe} />
-        <Button title="Start Sensor" onPress={_subscribe} />
-        <Button title="Go Back" onPress={() => navigation.goBack()} />
-      </View>
+      <Card>
+        <Card.Content>
+          <Title>Accelerometer</Title>
+          <Paragraph>X: {data.x.toFixed(2)}</Paragraph>
+          <Paragraph>Y: {data.y.toFixed(2)}</Paragraph>
+          <Paragraph>Z: {data.z.toFixed(2)}</Paragraph>
+          <Button mode="contained" onPress={() => navigation.goBack()} style={{marginTop:12}}>Back</Button>
+        </Card.Content>
+      </Card>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 20 },
-  message: { marginTop: 15, fontSize: 18, color: 'purple' },
-  buttons: { marginTop: 20, flexDirection: 'row', gap: 10 },
-});
+const styles = StyleSheet.create({ container:{flex:1,padding:20,justifyContent:"center"} });

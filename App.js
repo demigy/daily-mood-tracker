@@ -1,76 +1,70 @@
-import * as React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-// Import all screens
-import EditMoodScreen from './screens/EditMoodScreen';
-import MoodListScreen from './screens/MoodListScreen';
-import AccelerometerScreen from './screens/AccelerometerScreen';
-import CameraScreen from './screens/CameraScreen';
-import WelcomeScreen from './screens/WelcomeScreen';
-import LoginScreen from './screens/LoginScreen';
-import RegisterScreen from './screens/RegisterScreen';
-import HomeScreen from './screens/HomeScreen';
-import AddMoodScreen from './screens/AddMoodScreen';
-import MoodHistoryScreen from './screens/MoodHistoryScreen';
-import MoodDetailsScreen from './screens/MoodDetailsScreen';
-import SettingsScreen from './screens/SettingsScreen';
+import { 
+  Provider as PaperProvider, 
+  MD3LightTheme, 
+  MD3DarkTheme 
+} from "react-native-paper";
 
-const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
+// Screens
+import WelcomeScreen from "./screens/WelcomeScreen";
+import LoginScreen from "./screens/LoginScreen";
+import RegisterScreen from "./screens/RegisterScreen";
+import CameraScreen from "./screens/CameraScreen";
+import AccelerometerScreen from "./screens/AccelerometerScreen";
+import MoodDetailsScreen from "./screens/MoodDetailsScreen";
 
-function MainTabs() {
-  return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarIcon: ({ color, size }) => {
-          let iconName;
+// Bottom Tabs
+import BottomTabs from "./navigation/BottomTabs";
 
-          if (route.name === 'Home') {
-            iconName = 'home';
-          } else if (route.name === 'Add Mood') {
-            iconName = 'add-circle';
-          } else if (route.name === 'History') {
-            iconName = 'list';
-          } else if (route.name === 'Settings') {
-            iconName = 'settings';
-          }
-
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: 'purple',
-        tabBarInactiveTintColor: 'gray',
-      })}
-    >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Add Mood" component={AddMoodScreen} />
-      <Tab.Screen name="History" component={MoodHistoryScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
-    </Tab.Navigator>
-  );
-}
+const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const [isDark, setIsDark] = useState(false);
+
+  const CustomLight = {
+    ...MD3LightTheme,
+    colors: {
+      ...MD3LightTheme.colors,
+      primary: "#6A1B9A",
+      secondary: "#CE93D8",
+    },
+  };
+
+  const CustomDark = {
+    ...MD3DarkTheme,
+    colors: {
+      ...MD3DarkTheme.colors,
+      primary: "#BA68C8",
+      secondary: "#CE93D8",
+    },
+  };
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Welcome">
-        <Stack.Screen name="Welcome" component={WelcomeScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="EditMood" component={EditMoodScreen} />
-        <Stack.Screen
-          name="MainTabs"
-          component={MainTabs}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen name="MoodDetails" component={MoodDetailsScreen} />
-        <Stack.Screen name="Camera" component={CameraScreen} />
-        <Stack.Screen name="Accelerometer" component={AccelerometerScreen} />
-        <Stack.Screen name="MoodList" component={MoodListScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <PaperProvider theme={isDark ? CustomDark : CustomLight}>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+
+          <Stack.Screen name="Welcome" component={WelcomeScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
+
+          {/* MAIN TABS */}
+          <Stack.Screen 
+            name="MainTabs"
+            children={(props) => (
+              <BottomTabs {...props} setIsDark={setIsDark} />
+            )}
+          />
+
+          <Stack.Screen name="Camera" component={CameraScreen} />
+          <Stack.Screen name="Accelerometer" component={AccelerometerScreen} />
+          <Stack.Screen name="MoodDetails" component={MoodDetailsScreen} />
+
+        </Stack.Navigator>
+      </NavigationContainer>
+    </PaperProvider>
   );
 }

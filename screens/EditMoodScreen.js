@@ -1,57 +1,37 @@
-import React, { useState } from 'react';
-import { View, Text, Button, TextInput, StyleSheet, Alert } from 'react-native';
+// screens/EditMoodScreen.js
+import React, { useState } from "react";
+import { View, StyleSheet, Alert } from "react-native";
+import { Card, Title, TextInput, Button } from "react-native-paper";
 
 export default function EditMoodScreen({ navigation }) {
-  const [mood, setMood] = useState('');
-  const [id, setId] = useState('1'); // Example mood ID to update
+  const [mood, setMood] = useState("");
 
-  // Example PUT request (update mood)
-  const updateMood = async () => {
-    if (!mood) {
-      Alert.alert('Please enter a mood before updating!');
-      return;
-    }
-
+  const update = async () => {
+    if (!mood) { Alert.alert("Enter mood"); return; }
     try {
-      const response = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mood }),
+      // demo PUT to placeholder
+      const res = await fetch("https://jsonplaceholder.typicode.com/posts/1", {
+        method:"PUT",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ title:mood })
       });
-
-      const data = await response.json();
-      console.log('Mood updated:', data);
-      Alert.alert('Mood updated successfully!');
-      navigation.navigate('Home');
-    } catch (error) {
-      console.error('Error updating mood:', error);
-      Alert.alert('Failed to update mood');
-    }
+      await res.json();
+      Alert.alert("Updated (demo)");
+      navigation.navigate("MoodList");
+    } catch (e) { Alert.alert("Update failed"); }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Edit Mood</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter new mood..."
-        value={mood}
-        onChangeText={setMood}
-      />
-      <Button title="Update Mood" onPress={updateMood} />
+      <Card>
+        <Card.Content>
+          <Title>Edit Mood</Title>
+          <TextInput label="New mood" value={mood} onChangeText={setMood} mode="outlined" style={{marginTop:12}} />
+          <Button mode="contained" onPress={update} style={{marginTop:12}}>Update</Button>
+        </Card.Content>
+      </Card>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
-  title: { fontSize: 22, marginBottom: 20 },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    width: '100%',
-    padding: 10,
-    marginBottom: 15,
-  },
-});
+const styles = StyleSheet.create({ container:{flex:1,padding:20} });
