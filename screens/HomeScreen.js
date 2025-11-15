@@ -1,40 +1,63 @@
 // screens/HomeScreen.js
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { Title, Paragraph, Card, Button, FAB } from "react-native-paper";
+import { Button, Title, Text } from "react-native-paper";
 
 export default function HomeScreen({ navigation }) {
   return (
-    <View style={styles.wrap}>
-      <Title style={styles.title}>Today's Mood</Title>
-      <Paragraph style={styles.subtitle}>Record how you feel quickly — keep track of patterns over time.</Paragraph>
+    <View style={styles.container}>
+      <Title style={styles.title}>Daily Mood Tracker</Title>
 
-      <Card style={styles.card}>
-        <Card.Content>
-          <Button mode="contained" onPress={() => navigation.navigate("Add Mood")}>Quick Add</Button>
-          <Button style={styles.space} onPress={() => navigation.navigate("MoodList")}>View Mood History</Button>
-          <Button style={styles.space} onPress={() => navigation.navigate("Camera")}>Open Camera</Button>
-          <Button style={styles.space} onPress={() => navigation.navigate("Accelerometer")}>Accelerometer</Button>
-        </Card.Content>
-      </Card>
+      <Button
+        mode="contained"
+        style={styles.button}
+        onPress={() => navigation.navigate("AddMood")}
+      >
+        Quick Add Mood
+      </Button>
 
-      <Card style={styles.card}>
-        <Card.Title title="Recent" subtitle="Quick summary" />
-        <Card.Content>
-          <Paragraph>No saved local items yet (demo uses JSONPlaceholder). Use Add to create demo mood entries.</Paragraph>
-        </Card.Content>
-      </Card>
+      <Button
+        mode="contained"
+        style={styles.button}
+        onPress={() => navigation.navigate("History")}
+      >
+        View Mood History
+      </Button>
 
-      <FAB style={styles.fab} icon="plus" onPress={() => navigation.navigate("Add Mood")} />
+      <Button
+        mode="contained"
+        style={styles.button}
+        onPress={() => navigation.navigate("Camera")}
+      >
+        Open Camera
+      </Button>
+
+      <Button
+        mode="contained"
+        style={styles.button}
+        onPress={() => navigation.navigate("Settings")}
+      >
+        Settings
+      </Button>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap:{flex:1,padding:20},
-  title:{marginBottom:6},
-  subtitle:{color:"#666", marginBottom:14},
-  card:{marginBottom:12},
-  space:{marginTop:10},
-  fab:{position:"absolute", right:16, bottom:16}
+  container: {
+    flex: 1,
+    padding: 20,
+    justifyContent: "center",
+    backgroundColor: "white",
+  },
+  title: {
+    fontSize: 28,
+    marginBottom: 30,
+    textAlign: "center",
+    color: "#6200EE",
+  },
+  button: {
+    marginVertical: 10,
+    paddingVertical: 8,
+  },
 });
